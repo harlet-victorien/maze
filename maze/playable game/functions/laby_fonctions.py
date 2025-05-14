@@ -272,7 +272,7 @@ def affichage(labyrinthe, fenetre,  taille_case, couleur_mur, couleur_fond, joue
 
 
     decalage_x, decalage_y = decalage
-    fenetre.fill(couleur_fond)
+    #fenetre.fill(couleur_fond)
 
     for i, ligne in enumerate(labyrinthe):
         for j, case in enumerate(ligne):
