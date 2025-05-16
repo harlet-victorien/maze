@@ -18,14 +18,12 @@ p.init()
 p.key.set_repeat(300, 100)
 taille_fenetre = (1600, 950)
 fenetre = p.display.set_mode(taille_fenetre)
-backGroundColor=p.Color("LIGHTGREY")
+backGroundColor=((79, 124, 172), (192, 224, 222))
 colorMur = p.Color('#444444')
 font1 = p.font.SysFont('script', 100)
 font2 = p.font.SysFont('sysfont', 1)
 caseSize=20
 clock = Clock()
-
-print(p.font.get_fonts())
 
 tailleLaby = (10,10)
 

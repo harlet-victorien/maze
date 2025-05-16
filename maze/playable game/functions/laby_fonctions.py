@@ -198,7 +198,33 @@ def labyPoss_optimized(L, fenetre, font1):
 
 
 
-
+def create_background_gradient(fenetre, color1, color2, taille_fenetre):
+    """
+    Creates a linear gradient background between two colors.
+    
+    Args:
+        fenetre: The pygame surface to draw on
+        color1: The starting color (RGB tuple)
+        color2: The ending color (RGB tuple)
+        taille_fenetre: The dimensions of the window (width, height)
+    """
+    width, height = taille_fenetre
+    gradient_surface = p.Surface((width, height))
+    
+    for y in range(height):
+        # Calculate the ratio based on y position
+        ratio = y / height
+        
+        # Linear interpolation between colors
+        r = int(color1[0] * (1 - ratio) + color2[0] * ratio)
+        g = int(color1[1] * (1 - ratio) + color2[1] * ratio)
+        b = int(color1[2] * (1 - ratio) + color2[2] * ratio)
+        
+        # Draw a horizontal line with the calculated color
+        p.draw.line(gradient_surface, (r, g, b), (0, y), (width, y))
+    
+    fenetre.blit(gradient_surface, (0, 0))
+    return gradient_surface
 
 
 
@@ -268,32 +294,36 @@ def deplacement_créa(L,x,y):
 
 
 
-def affichage(labyrinthe, fenetre,  taille_case, couleur_mur, couleur_fond, joueur, decalage,historique_positions):
-
-
+def affichage(labyrinthe, fenetre, taille_case, couleur_mur, couleur_fond, joueur, decalage, historique_positions):
     decalage_x, decalage_y = decalage
-    #fenetre.fill(couleur_fond)
+    
+    # Create gradient background instead of solid color
+    if isinstance(couleur_fond, tuple) and len(couleur_fond) == 2:
+        # If couleur_fond is a tuple of two colors, use them for gradient
+        color1, color2 = couleur_fond
+        create_background_gradient(fenetre, color1, color2, fenetre.get_size())
+    else:
+        # Fall back to solid color if not a tuple of two colors
+        fenetre.fill(couleur_fond)
 
     for i, ligne in enumerate(labyrinthe):
         for j, case in enumerate(ligne):
             if case == 1:
-                p.draw.rect(fenetre,couleur_mur,p.Rect(j * taille_case - decalage_x,i * taille_case - decalage_y,taille_case,taille_case,),)
+                p.draw.rect(fenetre, couleur_mur, p.Rect(j * taille_case - decalage_x, i * taille_case - decalage_y, taille_case, taille_case))
             if case == 3:
-                p.draw.rect(fenetre,'red',p.Rect(j * taille_case - decalage_x,i * taille_case - decalage_y,taille_case,taille_case,),)
+                p.draw.rect(fenetre, 'red', p.Rect(j * taille_case - decalage_x, i * taille_case - decalage_y, taille_case, taille_case))
             if case == 4:
-                p.draw.rect(fenetre,'green',p.Rect(j * taille_case - decalage_x,i * taille_case - decalage_y,taille_case,taille_case,),)
+                p.draw.rect(fenetre, 'green', p.Rect(j * taille_case - decalage_x, i * taille_case - decalage_y, taille_case, taille_case))
 
-    
     for index, (x, y) in enumerate(historique_positions):
         alpha = int(255 * (1 - index / len(historique_positions)))
         couleur_trainee = (100, 100, 100, alpha)
         trainee = p.Surface((taille_case, taille_case), p.SRCALPHA)
         trainee.fill(couleur_trainee)
         fenetre.blit(trainee, (x * taille_case - decalage_x, y * taille_case - decalage_y))
-    # Dessiner le joueur
-    p.draw.rect(fenetre,(0, 0, 0),p.Rect(joueur.x * taille_case - decalage_x,joueur.y * taille_case - decalage_y,taille_case,taille_case,),)
     
-   
+    # Dessiner le joueur
+    p.draw.rect(fenetre, (0, 0, 0), p.Rect(joueur.x * taille_case - decalage_x, joueur.y * taille_case - decalage_y, taille_case, taille_case))
 
 def affichageScore(score, fenetre, font1, couleur_texte, decalage,taille_fenetre):
     decalage_x, decalage_y = decalage
@@ -304,20 +334,23 @@ def affichageScore(score, fenetre, font1, couleur_texte, decalage,taille_fenetre
 
 #- Affichage en cours de création
 
-def affichage_en_création (L, fenetre, caseSize, colorMur, backGroundColor,offset):
-    fenetre.fill(backGroundColor)
-    for i in range (len(L)):
+def affichage_en_création(L, fenetre, caseSize, colorMur, backGroundColor, offset):
+    # Create gradient background if backGroundColor is a tuple of two colors
+    if isinstance(backGroundColor, tuple) and len(backGroundColor) == 2:
+        color1, color2 = backGroundColor
+        create_background_gradient(fenetre, color1, color2, fenetre.get_size())
+    else:
+        fenetre.fill(backGroundColor)
         
-        for j in range (len(L[0])) :
-              
-            if L[i][j]==1:
-                p.draw.rect(fenetre, colorMur, (offset[0]+caseSize*j, offset[1]+caseSize*i, caseSize, caseSize))
-            if L[i][j]==3:
-                p.draw.rect(fenetre, 'red', (offset[0]+caseSize*j, offset[1]+caseSize*i, caseSize, caseSize))
-            if L[i][j]==4:
-                p.draw.rect(fenetre, 'green', (offset[0]+caseSize*j, offset[1]+caseSize*i, caseSize, caseSize))
-           
-             
+    for i in range(len(L)):
+        for j in range(len(L[0])):
+            if L[i][j] == 1:
+                p.draw.rect(fenetre, colorMur, (offset[0] + caseSize * j, offset[1] + caseSize * i, caseSize, caseSize))
+            if L[i][j] == 3:
+                p.draw.rect(fenetre, 'red', (offset[0] + caseSize * j, offset[1] + caseSize * i, caseSize, caseSize))
+            if L[i][j] == 4:
+                p.draw.rect(fenetre, 'green', (offset[0] + caseSize * j, offset[1] + caseSize * i, caseSize, caseSize))
+                
     p.display.flip()
 
 #- Affichage du tracé de la solution
